@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "ci-cd-demo-client-side-solution",
+    "id": "09b2e8b9-2d7d-4c07-8df5-f6c8e6b55a40",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "CI/CD_Demo description"
+      },
+      "longDescription": {
+        "default": "CI/CD_Demo description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "ci-cd-demo Feature",
+        "description": "The feature that activates elements of the ci-cd-demo solution.",
+        "id": "741b0768-2b1c-4c82-9e1b-0ac04de23975",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/ci-cd-demo.sppkg"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "20.15.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "ci-cd-demo",
+    "libraryId": "09b2e8b9-2d7d-4c07-8df5-f6c8e6b55a40",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "CI/CD_Demo",
+    "solutionShortDescription": "CI/CD_Demo description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
