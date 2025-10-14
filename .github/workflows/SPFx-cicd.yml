@@ -41,8 +41,8 @@ jobs:
     # 6. Connect to SharePoint Online
     - name: Connect to SharePoint
       run: |
-        $pass = ConvertTo-SecureString "${{ secrets.ADMIN_PASSWORD }}" -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential("${{ secrets.ADMIN_USERNAME }}", $pass)
+        $pass = ConvertTo-SecureString "O0g^k749g" -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential("swayampatel@t12y7.onmicrosoft.com", $pass)
         Connect-PnPOnline -Url $env:APP_CATALOG_URL -Credentials $cred
 
     # 7. Upload and deploy the SPFx package
@@ -55,7 +55,7 @@ jobs:
     - name: Send Email Notification
       if: env.SEND_MAIL == 'true'
       run: |
-        $pass = ConvertTo-SecureString "${{ secrets.SP_PASS }}" -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential("${{ secrets.SP_USER }}", $pass)
+        $pass = ConvertTo-SecureString "O0g^k749g" -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential("swayampatel@t12y7.onmicrosoft.com", $pass)
         Connect-PnPOnline -Url "https://t12y7.sharepoint.com/sites/MySite_Swayam" -Credentials $cred
         Send-PnPMail -To "swayamhpatel@outlook.com" -Subject "SPFx Deployment Completed" -Body "New SPFx package deployed successfully."
