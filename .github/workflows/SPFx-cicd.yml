@@ -1,69 +1,61 @@
-name: SPFx CICD with Office 365 CLI Ubuntu
-on: push
-# any branch can be specified
+name: SPFx CI/CD with PnP PowerShell
+on:
+  push:
+    branches:
+      - main   # or any branch you want
 
 env:
   SPPKG_FILE_NAME: 'cicddemo.sppkg'
+  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam/AppCatalog'
   SEND_MAIL: 'true'
 
-jobs: 
-
-  built-and-deploy:
-
-    runs-on: ubuntu-latest
-
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest   # PnP PowerShell works best on Windows runner
     steps:
 
-    #checkout code
+    # 1. Checkout repository
     - name: Checkout code
       uses: actions/checkout@v2
 
-    #Setup node.js runtime
-    - name: Use Node.js 20.x
-      uses: actions/setup-node@v1
+    # 2. Setup Node.js
+    - name: Setup Node.js 20.x
+      uses: actions/setup-node@v3
       with:
-        node-version: 20.x
+        node-version: 20
 
-    #npm install
-    - name: Install dependecies
+    # 3. Install dependencies
+    - name: Install npm dependencies
       run: npm ci
 
-    #gulp bundle and package solution
-    - name: Bundle and package
+    # 4. Bundle and package SPFx solution
+    - name: Bundle and package SPFx
       run: |
         gulp bundle --ship
         gulp package-solution --ship
 
-    # Login to tenant using action-cli-login
-    - name: Microsoft 365 CLI Login
-      uses: pnp/action-cli-login@v2.0.0
-      with:
-        ADMIN_USERNAME: 'swayampatel@t12y7.onmicrosoft.com'
-        ADMIN_PASSWORD: 'O0g^k749g'
+    # 5. Install PnP PowerShell module
+    - name: Install PnP PowerShell
+      run: Install-Module -Name PnP.PowerShell -Force -Scope CurrentUser
 
-    # Deploy package to tenant using action-cli-deploy
-    - name: Microsoft 365 CLI Deploy
-      uses: pnp/action-cli-deploy@v2.0.0
-      id: deploy
-      with:
-        APP_FILE_PATH: sharepoint/solution/${{ env.SPPKG_FILE_NAME }}
-        SKIP_FEATURE_DEPLOYEMENT: true
-        OVERWRITE: true
+    # 6. Connect to SharePoint Online
+    - name: Connect to SharePoint
+      run: |
+        $pass = ConvertTo-SecureString "${{ secrets.ADMIN_PASSWORD }}" -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential("${{ secrets.ADMIN_USERNAME }}", $pass)
+        Connect-PnPOnline -Url $env:APP_CATALOG_URL -Credentials $cred
 
-    # print app id
-    - name: Get the App_ID
-      run: echo "The App_Id is ${{ steps.deploy.outputs.APP_ID }}"
+    # 7. Upload and deploy the SPFx package
+    - name: Deploy SPFx package
+      run: |
+        Add-PnPApp -Path "sharepoint/solution/${{ env.SPPKG_FILE_NAME }}" -Overwrite
+        Publish-PnPApp -Identity ${{ env.SPPKG_FILE_NAME }}
 
-    # send an email using action-cli-runscript
-    - name: Microsoft 365 CLI Send email
-      uses: pnp/action-cli-runscript@v2.0.0
-      with:
-        CLI_MICROSOFT365_SCRIPT: m365 spo mail send --webUrl https://t12y7.sharepoint.com/sites/MySite_Swayam --to 'swayamhpatel@outlook.com'  --subject 'New Deploymnet succeed' --body 'new sppkg is deployed to appcatalog.'
+    # 8. Optional: Send an email notification
+    - name: Send Email Notification
       if: env.SEND_MAIL == 'true'
-
-
-
-
-
-
-        
+      run: |
+        $pass = ConvertTo-SecureString "${{ secrets.SP_PASS }}" -AsPlainText -Force
+        $cred = New-Object System.Management.Automation.PSCredential("${{ secrets.SP_USER }}", $pass)
+        Connect-PnPOnline -Url "https://t12y7.sharepoint.com/sites/MySite_Swayam" -Credentials $cred
+        Send-PnPMail -To "swayamhpatel@outlook.com" -Subject "SPFx Deployment Completed" -Body "New SPFx package deployed successfully."
