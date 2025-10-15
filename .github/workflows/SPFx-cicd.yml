@@ -42,7 +42,9 @@ jobs:
         APP_ID: ${{ secrets.APP_ID }}
         TENANT: ${{ secrets.TENANT_ID }}
         CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
-
+        # optional but recommended
+        DEBUG: true
+        
     # 6. Deploy SPFx package
     - name: Deploy SPFx package
       uses: pnp/action-cli-deploy@v2.0.0
