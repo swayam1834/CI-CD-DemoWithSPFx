@@ -5,7 +5,7 @@ on:
       - main  # Trigger on push to main branch
 
 env:
-  SPPKG_FILE_NAME: 'cicddemo.sppkg'
+  SPPKG_FILE_NAME: 'ci-cd-demo.sppkg'
   APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam/appCatalog'
   SEND_MAIL: 'true'
 
@@ -47,7 +47,7 @@ jobs:
     # 6. Deploy SPFx package to site collection app catalog
     - name: Deploy SPFx package
       run: |
-        m365 spo app add --filePath sharepoint/solution/${{ env.SPPKG_FILE_NAME }} --appCatalogUrl ${{ secrets.APP_CATALOG_URL }} --overwrite
+        m365 spo app add --filePath sharepoint/solution/${{ env_FILE_NAME }} --appCatalogUrl ${{ secrets.APP_CATALOG_URL }} --overwrite
 
     # 7. Optional: Send email notification
     - name: Send email notification
