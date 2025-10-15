@@ -61,7 +61,7 @@ jobs:
     # 6. Deploy SPFx package to site collection app catalog
     - name: Deploy SPFx package (debug)
       run: |
-        m365 spo app add --filePath sharepoint/solution/ci-cd-demo.sppkg --scope sitecollection \ --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam/AppCatalog" --overwrite --debug
+        m365 spo app add --filePath sharepoint/solution/ci-cd-demo.sppkg --scope sitecollection \ --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam" --overwrite --debug
 
 
     # 7. Optional: Send email notification
