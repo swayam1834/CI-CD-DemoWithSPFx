@@ -6,7 +6,7 @@ on:
 
 env:
   SPPKG_FILE_NAME: 'cicddemo.sppkg'
-  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam'
+  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam/appCatalog'
   SEND_MAIL: 'true'
 
 jobs:
