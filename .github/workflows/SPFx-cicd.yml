@@ -6,7 +6,6 @@ on:
 
 env:
   SPPKG_FILE_NAME: 'ci-cd-demo.sppkg'
-  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam'
   SEND_MAIL: 'true'
 
 jobs:
@@ -53,4 +52,4 @@ jobs:
     - name: Send email notification
       if: env.SEND_MAIL == 'true'
       run: |
-        m365 spo mail send --webUrl ${{ secrets.APP_CATALOG_URL }} --to 'swayamhpatel@outlook.com' --subject 'SPFx Deployment Success' --body 'New sppkg has been deployed to App Catalog.'
+        m365 spo mail send --webUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam" --to 'swayamhpatel@outlook.com' --subject 'SPFx Deployment Success' --body 'New sppkg has been deployed to App Catalog.'
