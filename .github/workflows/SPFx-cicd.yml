@@ -65,7 +65,6 @@ jobs:
         echo "📦 Uploading package to site collection app catalog..."
         m365 spo app add \
           --filePath "sharepoint/solution/${{ env.SPPKG_FILE_NAME }}" \
-          --scope sitecollection \
           --appCatalogUrl "${{ env.APP_CATALOG_URL }}" \
           --overwrite --debug
 
