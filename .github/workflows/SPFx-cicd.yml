@@ -33,6 +33,21 @@ jobs:
         gulp bundle --ship
         gulp package-solution --ship
 
+    # 4a. Validate SPFx package file
+    - name: Validate SPFx package file
+      run: |
+        FILE_PATH="sharepoint/solution/${{ env.SPPKG_FILE_NAME }}"
+        if [ ! -f "$FILE_PATH" ]; then
+          echo "ERROR: SPFx package file not found at $FILE_PATH"
+          exit 1
+        fi
+        FILE_SIZE=$(stat -c%s "$FILE_PATH")
+        if [ "$FILE_SIZE" -eq 0 ]; then
+          echo "ERROR: SPFx package file is empty"
+          exit 1
+        fi
+        echo "SPFx package file exists and is valid: $FILE_PATH (size: $FILE_SIZE bytes)"
+
     # 5. Login to SharePoint Online using certificate
     - name: Microsoft 365 CLI Login (Certificate)
       uses: pnp/action-cli-login@v3
@@ -44,9 +59,10 @@ jobs:
 
 
     # 6. Deploy SPFx package to site collection app catalog
-    - name: Deploy SPFx package
+    - name: Deploy SPFx package (debug)
       run: |
-        m365 spo app add --filePath sharepoint/solution/${{ env.SPPKG_FILE_NAME }} --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam/appcatalog" --overwrite
+        m365 spo app add --filePath sharepoint/solution/ci-cd-demo.sppkg --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam/appcatalog" --overwrite --debug
+
 
     # 7. Optional: Send email notification
     - name: Send email notification
