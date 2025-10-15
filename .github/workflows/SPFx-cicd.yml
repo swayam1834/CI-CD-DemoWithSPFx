@@ -46,7 +46,7 @@ jobs:
     # 6. Deploy SPFx package to site collection app catalog
     - name: Deploy SPFx package
       run: |
-        m365 spo app add --filePath sharepoint/solution/${{ env.SPPKG_FILE_NAME }} --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam" --overwrite
+        m365 spo app add --filePath sharepoint/solution/${{ env.SPPKG_FILE_NAME }} --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam/appcatalog" --overwrite
 
     # 7. Optional: Send email notification
     - name: Send email notification
