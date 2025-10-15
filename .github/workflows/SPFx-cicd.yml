@@ -1,20 +1,20 @@
-name: SPFx CI/CD with PnP PowerShell
+name: SPFx CI/CD Pipeline
 on:
   push:
     branches:
-      - main   # or any branch you want
+      - main  # Trigger on push to main branch
 
 env:
   SPPKG_FILE_NAME: 'cicddemo.sppkg'
-  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam/AppCatalog'
+  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam'
   SEND_MAIL: 'true'
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest   # PnP PowerShell works best on Windows runner
-    steps:
+    runs-on: ubuntu-latest
 
-    # 1. Checkout repository
+    steps:
+    # 1. Checkout code
     - name: Checkout code
       uses: actions/checkout@v2
 
@@ -28,34 +28,35 @@ jobs:
     - name: Install npm dependencies
       run: npm ci
 
-    # 4. Bundle and package SPFx solution
+    # 4. Bundle and package SPFx
     - name: Bundle and package SPFx
       run: |
         gulp bundle --ship
         gulp package-solution --ship
 
-    # 5. Install PnP PowerShell module
-    - name: Install PnP PowerShell
-      run: Install-Module -Name PnP.PowerShell -Force -Scope CurrentUser
+    # 5. Login to SharePoint Online using certificate
+    - name: Microsoft 365 CLI Login (Certificate)
+      uses: pnp/action-cli-login@v2.0.0
+      with:
+        AUTH_TYPE: certificate
+        APP_ID: ${{ secrets.APP_ID }}
+        TENANT: ${{ secrets.TENANT_ID }}
+        CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
 
-    # 6. Connect to SharePoint Online
-    - name: Connect to SharePoint
-      run: |
-        $pass = ConvertTo-SecureString "O0g^k749g" -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential("swayampatel@t12y7.onmicrosoft.com", $pass)
-        Connect-PnPOnline -Url $env:APP_CATALOG_URL -Credentials $cred
-
-    # 7. Upload and deploy the SPFx package
+    # 6. Deploy SPFx package
     - name: Deploy SPFx package
-      run: |
-        Add-PnPApp -Path "sharepoint/solution/${{ env.SPPKG_FILE_NAME }}" -Overwrite
-        Publish-PnPApp -Identity ${{ env.SPPKG_FILE_NAME }}
+      uses: pnp/action-cli-deploy@v2.0.0
+      with:
+        APP_FILE_PATH: sharepoint/solution/${{ env.SPPKG_FILE_NAME }}
+        APP_CATALOG_SCOPE: sitecollection
+        APP_CATALOG_URL: ${{ secrets.APP_CATALOG_URL }}
+        SKIP_FEATURE_DEPLOYEMENT: true
+        OVERWRITE: true
 
-    # 8. Optional: Send an email notification
-    - name: Send Email Notification
+    # 7. Optional: Send email notification
+    - name: Send email notification
       if: env.SEND_MAIL == 'true'
-      run: |
-        $pass = ConvertTo-SecureString "O0g^k749g" -AsPlainText -Force
-        $cred = New-Object System.Management.Automation.PSCredential("swayampatel@t12y7.onmicrosoft.com", $pass)
-        Connect-PnPOnline -Url "https://t12y7.sharepoint.com/sites/MySite_Swayam" -Credentials $cred
-        Send-PnPMail -To "swayamhpatel@outlook.com" -Subject "SPFx Deployment Completed" -Body "New SPFx package deployed successfully."
+      uses: pnp/action-cli-runscript@v2.0.0
+      with:
+        CLI_MICROSOFT365_SCRIPT: |
+          m365 spo mail send --webUrl ${{ secrets.APP_CATALOG_URL }} --to 'swayamhpatel@outlook.com' --subject 'SPFx Deployment Success' --body 'New sppkg has been deployed to App Catalog.'
