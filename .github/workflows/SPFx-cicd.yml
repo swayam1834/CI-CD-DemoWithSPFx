@@ -71,6 +71,7 @@ jobs:
         echo "🚀 Deploying package..."
         m365 spo app deploy \
           --name "${{ env.SPPKG_FILE_NAME }}" \
+          --scope sitecollection \
           --appCatalogUrl "${{ env.APP_CATALOG_URL }}" \
           --skipFeatureDeployment
 
