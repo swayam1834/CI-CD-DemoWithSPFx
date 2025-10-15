@@ -36,12 +36,12 @@ jobs:
 
     # 5. Login to SharePoint Online using certificate
     - name: Microsoft 365 CLI Login (Certificate)
-      uses: microsoft365/cli-action@v3
+      uses: pnp/action-cli-login@v3
       with:
-        loginType: certificate
-        tenant: ${{ secrets.TENANT_ID }}
-        clientId: ${{ secrets.APP_ID }}
-        certificateBase64: ${{ secrets.CERTIFICATE_BASE64 }}
+        TENANT: ${{ secrets.TENANT_ID }}
+        APP_ID: ${{ secrets.APP_ID }}
+        CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_BASE64 }}
+        CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
 
     # 6. Deploy SPFx package to site collection app catalog
     - name: Deploy SPFx package
