@@ -36,29 +36,20 @@ jobs:
 
     # 5. Login to SharePoint Online using certificate
     - name: Microsoft 365 CLI Login (Certificate)
-      uses: pnp/action-cli-login@v2.0.0
+      uses: microsoft365/cli-action@v3
       with:
-        AUTH_TYPE: certificate
-        APP_ID: ${{ secrets.APP_ID }}
-        TENANT: ${{ secrets.TENANT_ID }}
-        CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
-        # optional but recommended
-        DEBUG: true
-        
-    # 6. Deploy SPFx package
+        loginType: certificate
+        tenant: ${{ secrets.TENANT_ID }}
+        clientId: ${{ secrets.APP_ID }}
+        certificateBase64: ${{ secrets.CERTIFICATE_BASE64 }}
+
+    # 6. Deploy SPFx package to site collection app catalog
     - name: Deploy SPFx package
-      uses: pnp/action-cli-deploy@v2.0.0
-      with:
-        APP_FILE_PATH: sharepoint/solution/${{ env.SPPKG_FILE_NAME }}
-        APP_CATALOG_SCOPE: sitecollection
-        APP_CATALOG_URL: ${{ secrets.APP_CATALOG_URL }}
-        SKIP_FEATURE_DEPLOYEMENT: true
-        OVERWRITE: true
+      run: |
+        m365 spo app add --filePath sharepoint/solution/${{ env.SPPKG_FILE_NAME }} --appCatalogUrl ${{ secrets.APP_CATALOG_URL }} --overwrite
 
     # 7. Optional: Send email notification
     - name: Send email notification
       if: env.SEND_MAIL == 'true'
-      uses: pnp/action-cli-runscript@v2.0.0
-      with:
-        CLI_MICROSOFT365_SCRIPT: |
-          m365 spo mail send --webUrl ${{ secrets.APP_CATALOG_URL }} --to 'swayamhpatel@outlook.com' --subject 'SPFx Deployment Success' --body 'New sppkg has been deployed to App Catalog.'
+      run: |
+        m365 spo mail send --webUrl ${{ secrets.APP_CATALOG_URL }} --to 'swayamhpatel@outlook.com' --subject 'SPFx Deployment Success' --body 'New sppkg has been deployed to App Catalog.'
