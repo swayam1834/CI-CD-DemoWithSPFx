@@ -7,6 +7,8 @@ on:
 env:
   SPPKG_FILE_NAME: 'ci-cd-demo.sppkg'
   SEND_MAIL: 'true'
+  SITE_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam'
+  APP_CATALOG_URL: 'https://t12y7.sharepoint.com/sites/MySite_Swayam/AppCatalog'
 
 jobs:
   build-and-deploy:
@@ -46,9 +48,9 @@ jobs:
           echo "ERROR: SPFx package file is empty"
           exit 1
         fi
-        echo "SPFx package file exists and is valid: $FILE_PATH (size: $FILE_SIZE bytes)"
+        echo "✅ SPFx package file is valid: $FILE_PATH ($FILE_SIZE bytes)"
 
-    # 5. Login to SharePoint Online using certificate
+    # 5. Login to Microsoft 365 using certificate
     - name: Microsoft 365 CLI Login (Certificate)
       uses: pnp/action-cli-login@v3
       with:
@@ -57,15 +59,27 @@ jobs:
         CERTIFICATE_ENCODED: ${{ secrets.CERTIFICATE_BASE64 }}
         CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
 
-
     # 6. Deploy SPFx package to site collection app catalog
-    - name: Deploy SPFx package (debug)
+    - name: Upload & Deploy SPFx package
       run: |
-        m365 spo app add --filePath sharepoint/solution/ci-cd-demo.sppkg --scope sitecollection \ --appCatalogUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam" --overwrite --debug
+        echo "📦 Uploading package to site collection app catalog..."
+        m365 spo app add \
+          --filePath "sharepoint/solution/${{ env.SPPKG_FILE_NAME }}" \
+          --scope sitecollection \
+          --appCatalogUrl "${{ env.APP_CATALOG_URL }}" \
+          --overwrite --debug
 
+        echo "🚀 Deploying package..."
+        m365 spo app deploy \
+          --name "${{ env.SPPKG_FILE_NAME }}" \
+          --appCatalogUrl "${{ env.APP_CATALOG_URL }}" \
+          --skipFeatureDeployment
 
     # 7. Optional: Send email notification
     - name: Send email notification
       if: env.SEND_MAIL == 'true'
       run: |
-        m365 spo mail send --webUrl "https://t12y7.sharepoint.com/sites/MySite_Swayam" --to 'swayamhpatel@outlook.com' --subject 'SPFx Deployment Success' --body 'New sppkg has been deployed to App Catalog.'
+        m365 outlook mail send \
+          --to "swayamhpatel@outlook.com" \
+          --subject "SPFx Deployment Success" \
+          --body "New SPFx package has been deployed successfully to App Catalog."
